@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ghibli Park Itinerary Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: url('assets/bg-totoro.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .header-title {
+      text-align: center;
+      color: #2d5016;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+      font-weight: bold;
+      font-family: cursive;
+    }
+    .accordion {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      background: transparent !important;
+      border: none !important;
+    }
+    .accordion-item {
+      border: none !important;
+      margin: 0;
+      border-bottom: 2px solid rgba(255,255,255,0.2) !important;
+      background: transparent !important;
+    }
+    .accordion-item:last-child {
+      border-bottom: none !important;
+    }
+    .accordion-flush .accordion-item {
+      border-right: none !important;
+      border-left: none !important;
+      border-radius: 0 !important;
+    }
+    .accordion-button {
+      color: white !important;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 20px 25px;
+      border: none !important;
+      text-align: left;
+      transition: all 0.3s ease;
+      font-family: cursive;
+      background-size: cover !important;
+      background-position: center !important;
+      background-color: transparent !important;
+      background-image: none !important;
+    }
+    .accordion-button:hover {
+      opacity: 0.9;
+    }
+    .accordion-button:not(.collapsed) {
+      color: white !important;
+      background-color: transparent !important;
+      background-image: inherit !important;
+    }
+    .accordion-button::after {
+      filter: brightness(0) invert(1);
+    }
+    .accordion-header {
+      background: transparent !important;
+    }
+    .acc-bg1 .accordion-button {
+      background: url('assets/acc-bg1.jpg') no-repeat center center !important;
+      background-size: cover !important;
+    }
+    .acc-bg2 .accordion-button {
+      background: url('assets/acc-bg2.jpg') no-repeat center center !important;
+      background-size: cover !important;
+    }
+    .acc-bg3 .accordion-button {
+      background: url('assets/acc-bg3.jpg') no-repeat center center !important;
+      background-size: cover !important;
+    }
+    .acc-bg4 .accordion-button {
+      background: url('assets/acc-bg4.jpg') no-repeat center center !important;
+      background-size: cover !important;
+    }
+    .acc-bg5 .accordion-button {
+      background: url('assets/acc-bg5.jpg') no-repeat center center !important;
+      background-size: cover !important;
+    }
+    .accordion-body {
+      background: rgba(245, 240, 230, 0.95);
+      padding: 25px;
+    }
+    .form-label {
+      font-weight: 600;
+      color: #2d5016;
+      margin-bottom: 5px;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      padding: 10px 15px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #4a7c23;
+      box-shadow: 0 0 0 3px rgba(74, 124, 35, 0.2);
+    }
+    .form-check-input {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+    }
+    .form-check-label {
+      color: #333;
+    }
+    .error {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 5px;
+      display: block;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4a7c23 0%, #2d5016 100%);
+      border: none;
+      border-radius: 30px;
+      padding: 15px 50px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(74, 124, 35, 0.4);
+      font-family: cursive;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(74, 124, 35, 0.5);
+    }
+    .button-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .general-error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      border: 1px solid #f5c6cb;
+    }
+    .summary-container {
+      background: rgba(74, 124, 35, 0.1);
+      border: 2px solid #4a7c23;
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 30px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .summary-title {
+      color: #2d5016;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .summary-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+    .summary-label {
+      font-weight: 600;
+      color: #4a7c23;
+    }
+    .place-card {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    .place-card:hover {
+      border-color: #4a7c23;
+      box-shadow: 0 5px 20px rgba(74, 124, 35, 0.2);
+    }
+    .place-card.selected {
+      border-color: #4a7c23;
+      box-shadow: 0 0 0 3px rgba(74, 124, 35, 0.3);
+    }
+    .place-card.selected::before {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background: #4a7c23;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      z-index: 10;
+    }
+    .place-image {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+    .place-info {
+      padding: 12px;
+    }
+    .place-name {
+      font-weight: 600;
+      color: #2d5016;
+      margin-bottom: 5px;
+      font-size: 0.95rem;
+    }
+    .place-description {
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.4;
+    }
+    .places-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+    .places-instruction {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+    .loading-text {
+      color: #4a7c23;
+      text-align: center;
+      padding: 20px;
+    }
+    .places-error {
+      color: #dc3545;
+      text-align: center;
+      padding: 20px;
+    }
+    @media (max-width: 768px) {
+      .places-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 576px) {
+      .places-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="container">
+      <h1 class="header-title">Ghibli Park Itinerary Builder</h1>
+      
+      <div v-if="generalError" class="general-error">
+        {{ generalError }}
+      </div>
+
+      <div class="accordion" id="ghibliAccordion">
+        <div class="accordion-item acc-bg1">
+          <h2 class="accordion-header" id="headingPersonal">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePersonal">
+              Personal Details
+            </button>
+          </h2>
+          <div id="collapsePersonal" class="accordion-collapse collapse show" data-bs-parent="#ghibliAccordion">
+            <div class="accordion-body">
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input v-model="form.fullName" type="text" class="form-control" placeholder="Enter your full name">
+                <span v-if="errors.fullName" class="error">{{ errors.fullName }}</span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Date of Birth</label>
+                <input v-model="form.dateOfBirth" type="date" class="form-control">
+                <span v-if="errors.dateOfBirth" class="error">{{ errors.dateOfBirth }}</span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Gender</label>
+                <div class="form-check">
+                  <input v-model="form.gender" type="radio" value="male" class="form-check-input" id="genderMale">
+                  <label class="form-check-label" for="genderMale">Male</label>
+                </div>
+                <div class="form-check">
+                  <input v-model="form.gender" type="radio" value="female" class="form-check-input" id="genderFemale">
+                  <label class="form-check-label" for="genderFemale">Female</label>
+                </div>
+                <div class="form-check">
+                  <input v-model="form.gender" type="radio" value="other" class="form-check-input" id="genderOther">
+                  <label class="form-check-label" for="genderOther">Other</label>
+                </div>
+                <span v-if="errors.gender" class="error">{{ errors.gender }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item acc-bg2">
+          <h2 class="accordion-header" id="headingSelection">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSelection">
+              Ghibli Park Selection
+            </button>
+          </h2>
+          <div id="collapseSelection" class="accordion-collapse collapse" data-bs-parent="#ghibliAccordion">
+            <div class="accordion-body">
+              <div v-if="isLoadingPlaces" class="loading-text">Loading places...</div>
+              <div v-else-if="placesError" class="places-error">{{ placesError }}</div>
+              <div v-else>
+                <div class="places-instruction">Click a place to select it. Click it again to deselect it.</div>
+                <div class="places-grid">
+                  <div 
+                    v-for="place in places" 
+                    :key="place.id"
+                    :class="['place-card', { selected: isPlaceSelected(place.id) }]"
+                    @click="togglePlace(place)"
+                  >
+                    <img :src="place.image" :alt="place.name" class="place-image">
+                    <div class="place-info">
+                      <div class="place-name">{{ place.name }}</div>
+                      <div class="place-description">{{ place.description }}</div>
+                    </div>
+                  </div>
+                </div>
+                <span v-if="errors.places" class="error">{{ errors.places }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item acc-bg3">
+          <h2 class="accordion-header" id="headingVisitors">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVisitors">
+              Visitors Details
+            </button>
+          </h2>
+          <div id="collapseVisitors" class="accordion-collapse collapse" data-bs-parent="#ghibliAccordion">
+            <div class="accordion-body">
+              <div class="mb-3">
+                <label class="form-label">Total number of visitors</label>
+                <input v-model="form.totalVisitors" type="number" class="form-control" min="1" placeholder="Enter total visitors">
+                <span v-if="errors.totalVisitors" class="error">{{ errors.totalVisitors }}</span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Total number of children</label>
+                <input v-model="form.totalChildren" type="number" class="form-control" min="0" placeholder="Enter number of children">
+                <span v-if="errors.totalChildren" class="error">{{ errors.totalChildren }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item acc-bg4">
+          <h2 class="accordion-header" id="headingAccommodation">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccommodation">
+              Accommodation
+            </button>
+          </h2>
+          <div id="collapseAccommodation" class="accordion-collapse collapse" data-bs-parent="#ghibliAccordion">
+            <div class="accordion-body">
+              <div class="mb-3">
+                <label class="form-label">Select accommodation</label>
+                <select v-model="form.accommodation" class="form-select">
+                  <option value="">-- Please select --</option>
+                  <option v-for="option in accommodationOptions" :key="option.value" :value="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+                <span v-if="errors.accommodation" class="error">{{ errors.accommodation }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item acc-bg5">
+          <h2 class="accordion-header" id="headingPayment">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayment">
+              Payment Details
+            </button>
+          </h2>
+          <div id="collapsePayment" class="accordion-collapse collapse" data-bs-parent="#ghibliAccordion">
+            <div class="accordion-body">
+              <div class="mb-3">
+                <label class="form-label">Name of the cardholder</label>
+                <input v-model="form.cardholderName" type="text" class="form-control" placeholder="Enter cardholder name">
+                <span v-if="errors.cardholderName" class="error">{{ errors.cardholderName }}</span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Card number</label>
+                <input v-model="form.cardNumber" type="text" class="form-control" placeholder="Enter card number">
+                <span v-if="errors.cardNumber" class="error">{{ errors.cardNumber }}</span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Expiration Date</label>
+                <input v-model="form.expirationDate" type="month" class="form-control">
+                <span v-if="errors.expirationDate" class="error">{{ errors.expirationDate }}</span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">CVV</label>
+                <input v-model="form.cvv" type="password" class="form-control" placeholder="Enter CVV">
+                <span v-if="errors.cvv" class="error">{{ errors.cvv }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <button @click="generateItinerary" class="btn btn-primary">
+          Generate Itinerary
+        </button>
+      </div>
+
+      <div v-if="showSummary" class="summary-container">
+        <h2 class="summary-title">🎉 Your Itinerary Summary</h2>
+        
+        <div class="summary-item">
+          <span class="summary-label">Name:</span> {{ form.fullName }}
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Date of Birth:</span> {{ form.dateOfBirth }}
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Gender:</span> {{ form.gender }}
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Visitors:</span> {{ form.totalVisitors }} ({{ form.totalChildren }} children)
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Accommodation:</span> {{ getAccommodationLabel(form.accommodation) }}
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Selected Places:</span>
+          <ul>
+            <li v-for="place in selectedPlaces" :key="place.id">{{ place.name }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const { createApp, ref, reactive, onMounted } = Vue
+
+    createApp({
+      setup() {
+        const form = reactive({
+          fullName: '',
+          dateOfBirth: '',
+          gender: '',
+          totalVisitors: '',
+          totalChildren: '',
+          accommodation: '',
+          cardholderName: '',
+          cardNumber: '',
+          expirationDate: '',
+          cvv: ''
+        })
+
+        const errors = reactive({
+          fullName: '',
+          dateOfBirth: '',
+          gender: '',
+          places: '',
+          totalVisitors: '',
+          totalChildren: '',
+          accommodation: '',
+          cardholderName: '',
+          cardNumber: '',
+          expirationDate: '',
+          cvv: ''
+        })
+
+        const generalError = ref('')
+        const places = ref([
+          { "id": "gwh1", "name": "Central Stairs", "image": "assets/gwh1.jpg", "description": "A brilliant mosaic tile staircase connecting first and second floors." },
+          { "id": "gwh2", "name": "Open Warehouse", "image": "assets/gwh2.jpg", "description": "Contains production artifacts and sculptures from past exhibits in Japan and abroad" },
+          { "id": "gwh3", "name": "No-Face", "image": "assets/gwh3.jpg", "description": "Part of interactive exhibits,where you can become your favorite Studio Ghibli characters." },
+          { "id": "gwh4", "name": "Ghibli Meals", "image": "assets/gwh4.jpg", "description": "Why does the food in Studio Ghibli films look so delicious!? Those secrets are revealed here." },
+          { "id": "gwh5", "name": "Ghibli Posters", "image": "assets/gwh5.jpg", "description": "A collection of Studio Ghibli posters, film and music packagings, books and more, all in one place" },
+          { "id": "gwh6", "name": "Screening Room Cinema Orion", "image": "assets/gwh6.jpg", "description": "Seating about 170 people, Orion screens Studio Ghibli animated-shorts." },
+          { "id": "gwh7", "name": "Director's Office", "image": "assets/gwh7.jpg", "description": "Yubaba from 'Spirited Away' is busy at work." },
+          { "id": "gwh8", "name": "Catbus Room", "image": "assets/gwh8.jpg", "description": "In the play area that recreates the world of My Neighbor Totoro, a one-of-a-kind Cat Bus awaits." },
+          { "id": "gwh9", "name": "Children's Town", "image": "assets/gwh9.jpg", "description": "This area is a mini-replica of the Higashi-Koganei Station area in Tokyo where Studio Ghibli is located." },
+          { "id": "gwh10", "name": "Garden in the Sky", "image": "assets/gwh10.jpg", "description": "Robot Soldiers, from Castle in the Sky, wait patiently for their master to return." },
+          { "id": "gwh11", "name": "The House Below and the Little People's Garden", "image": "assets/gwh11.jpg", "description": "The house where the main character Arrietty and her family live and the surrounding garden." },
+          { "id": "gwh12", "name": "Shop 'Adventurous Flying Squadron'", "image": "assets/gwh12.jpg", "description": "Sells items from all Studio Ghibli productions as well as original Ghibli Park items." },
+          { "id": "gwh13", "name": "Transcontinental Flight Cafe", "image": "assets/gwh13.jpg", "description": "The café has a line-up of sandwiches, pizzas, etc." },
+          { "id": "hoy1", "name": "Elevator Tower", "image": "assets/hoy1.jpg", "description": "A late 19th century sci-fi architecture that appears in 'Castle in the Sky' and 'Howl's Moving Castle'." },
+          { "id": "hoy2", "name": "World Emporium", "image": "assets/hoy2.jpg", "description": "Antique repair and resale shop from 'Whisper of the Heart'." },
+          { "id": "hoy3", "name": "The Cat Bureau", "image": "assets/hoy3.jpg", "description": "From 'The Cat Returns', this is a cat-sized single-storey wooden building." },
+          { "id": "hoy4", "name": "The Rotary", "image": "assets/hoy4.jpg", "description": "A roundabout like the one in the town square from 'Whisper of the Heart'." },
+          { "id": "df1", "name": "Satsuki and Mei's House", "image": "assets/df1.jpg", "description": "This is the Japanese-Western style house Satsuki and Mei moved to in 'My Neighbor Totoro'." },
+          { "id": "df2", "name": "Dondoko-do", "image": "assets/df2.jpg", "description": "A 5-meter-tall wooden play equipment where children of twelve years and under can play inside." },
+          { "id": "df3", "name": "Dondoko Shop", "image": "assets/df3.jpg", "description": "Keychains, amulet pouches and original Dondoko Forest souvenirs are available for purchase in this shop." },
+          { "id": "df4", "name": "Dondoko-Dokoro", "image": "assets/df4.jpg", "description": "Sells drinks, souvenirs and seasonal items." },
+          { "id": "df5", "name": "Dondoko-go", "image": "assets/df5.jpg", "description": "The slope car connects the ground level to the peak of the Dondoko Forest hill." },
+          { "id": "mv1", "name": "Tatara-ba", "image": "assets/mv1.jpg", "description": "This is a hands-on learning center designed to look like a building in 'Princess Mononoke'." },
+          { "id": "mv2", "name": "Charcoal-grilled Gohei-Mochi Cooking Experience", "image": "assets/mv2.jpg", "description": "Add your preferred sauce and cook this beloved local snack yourself over a traditional charcoal grill." },
+          { "id": "mv3", "name": "Stone-milled Kinako Grinding Experience", "image": "assets/mv3.jpg", "description": "Learn the traditional way of making kinako (soybean flour) using a stone mill." },
+          { "id": "mv4", "name": "Lord Okkoto", "image": "assets/mv4.jpg", "description": "This is a slide based on the character Lord Okkoto from 'Princess Mononoke'." },
+          { "id": "mv5", "name": "Demon Spirit", "image": "assets/mv5.jpg", "description": "This structure is based on the Demon Spirit from 'Princess Mononoke'." },
+          { "id": "mv6", "name": "Mononoke Village Rest Stop", "image": "assets/mv6.jpg", "description": "The rest stop shop sells original items as well as refreshments to help you relax and recharge." },
+          { "id": "vow1", "name": "The Mouth of the Witch", "image": "assets/vow1.jpg", "description": "At the entrance of Valley of Witches, this structure is inspired by the witch Bella Yaga from Earwig and the Witch." },
+          { "id": "vow2", "name": "Okino Residence", "image": "assets/vow2.jpg", "description": "This is a two-storey house where Kiki, the main character from 'Kiki's Delivery Service', lives." },
+          { "id": "vow3", "name": "Guchokipanya Bakery", "image": "assets/vow3.jpg", "description": "The bakery where the main character Kiki and her black cat Jiji from 'Kiki's Delivery Service' live." },
+          { "id": "vow4", "name": "Howl's Castle", "image": "assets/vow4.jpg", "description": "About 20-meters-tall, this is the castle with creature-like features from 'Howl's Moving Castle'." },
+          { "id": "vow5", "name": "Hatter's Millinery", "image": "assets/vow5.jpg", "description": "This is the two-storey hat shop that Sophie, the main character from 'Howl's Moving Castle', manages." },
+          { "id": "vow6", "name": "The House of Witches", "image": "assets/vow6.jpg", "description": "This house is where Earwig, the main character from 'Earwig and the Witch', was taken to live." },
+          { "id": "vow7", "name": "Carousel", "image": "assets/vow7.jpg", "description": "This is a ride for children imagined as one from a traveling fair that comes to the village once a year." },
+          { "id": "vow8", "name": "Flying Machine", "image": "assets/vow8.jpg", "description": "This is a ride for children imagined as one from a traveling fair that comes to the village once a year." },
+          { "id": "vow9", "name": "Lift for Witches", "image": "assets/vow9.jpg", "description": "This elevator goes up to the second floor of Guchokipanya Bakery and Hatter's Millinery." },
+          { "id": "vow10", "name": "Flying Oven", "image": "assets/vow10.jpg", "description": "A restaurant with an impressive brick exterior is located near the entrance to the Valley of Witches." },
+          { "id": "vow11", "name": "Witch Coven 13", "image": "assets/vow11.jpg", "description": "This shop has a variety of original Valley of Witches items." }
+        ])
+        const isLoadingPlaces = ref(false)
+        const placesError = ref('')
+        const selectedPlaces = ref([])
+        const showSummary = ref(false)
+
+        const accommodationOptions = [
+          { value: 'none', label: 'No accommodation needed' },
+          { value: 'forest', label: 'Forest View Hotel' },
+          { value: 'totoro', label: 'Totoro Family Inn' },
+          { value: 'witch', label: 'Witch Valley Guesthouse' },
+          { value: 'luxury', label: 'Luxury Ghibli Resort' }
+        ]
+
+        const loadPlaces = () => {
+          isLoadingPlaces.value = false
+        }
+
+        const isPlaceSelected = (id) => {
+          return selectedPlaces.value.some(place => place.id === id)
+        }
+
+        const togglePlace = (place) => {
+          const index = selectedPlaces.value.findIndex(p => p.id === place.id)
+          if (index > -1) {
+            selectedPlaces.value.splice(index, 1)
+          } else {
+            selectedPlaces.value.push(place)
+          }
+        }
+
+        const clearErrors = () => {
+          for (const key in errors) {
+            errors[key] = ''
+          }
+          generalError.value = ''
+        }
+
+        const validateForm = () => {
+          let isValid = true
+
+          if (!form.fullName.trim()) {
+            errors.fullName = 'Please enter your full name'
+            isValid = false
+          }
+
+          if (!form.dateOfBirth) {
+            errors.dateOfBirth = 'Please select your date of birth'
+            isValid = false
+          }
+
+          if (!form.gender) {
+            errors.gender = 'Please select your gender'
+            isValid = false
+          }
+
+          if (selectedPlaces.value.length === 0) {
+            errors.places = 'Please select at least one place'
+            isValid = false
+          }
+
+          if (!form.totalVisitors || parseInt(form.totalVisitors) < 1) {
+            errors.totalVisitors = 'Please enter valid number of visitors (minimum 1)'
+            isValid = false
+          }
+
+          if (form.totalChildren === '' || parseInt(form.totalChildren) < 0) {
+            errors.totalChildren = 'Please enter valid number of children (minimum 0)'
+            isValid = false
+          }
+
+          if (!form.accommodation) {
+            errors.accommodation = 'Please select accommodation option'
+            isValid = false
+          }
+
+          if (!form.cardholderName.trim()) {
+            errors.cardholderName = 'Please enter cardholder name'
+            isValid = false
+          }
+
+          if (!form.cardNumber.trim()) {
+            errors.cardNumber = 'Please enter card number'
+            isValid = false
+          }
+
+          if (!form.expirationDate) {
+            errors.expirationDate = 'Please select expiration date'
+            isValid = false
+          }
+
+          if (!form.cvv) {
+            errors.cvv = 'Please enter CVV'
+            isValid = false
+          }
+
+          return isValid
+        }
+
+        const generateItinerary = () => {
+          clearErrors()
+          showSummary.value = false
+
+          if (validateForm()) {
+            showSummary.value = true
+          } else {
+            generalError.value = 'There are mandatory items pending to be filled. Please complete the required fields.'
+          }
+        }
+
+        const getAccommodationLabel = (value) => {
+          const option = accommodationOptions.find(opt => opt.value === value)
+          return option ? option.label : ''
+        }
+
+        onMounted(() => {
+          loadPlaces()
+        })
+
+        return {
+          form,
+          errors,
+          generalError,
+          places,
+          isLoadingPlaces,
+          placesError,
+          selectedPlaces,
+          showSummary,
+          accommodationOptions,
+          loadPlaces,
+          isPlaceSelected,
+          togglePlace,
+          clearErrors,
+          validateForm,
+          generateItinerary,
+          getAccommodationLabel
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>
